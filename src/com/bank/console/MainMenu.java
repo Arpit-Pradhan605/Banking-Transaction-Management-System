@@ -1,5 +1,6 @@
 package com.bank.console;
 
+import com.bank.exceptions.DuplicateCustomerException;
 import com.bank.models.Customer;
 import com.bank.services.AccountService;
 import com.bank.services.AdminService;
@@ -60,7 +61,7 @@ public class MainMenu {
         try {
             Customer customer = customerService.registerCustomer(username, password);
             System.out.println("Customer registered. Customer ID: " + customer.getCustomerId());
-        } catch (IllegalArgumentException exception) {
+        } catch (DuplicateCustomerException | IllegalArgumentException exception) {
             System.out.println("Registration failed: " + exception.getMessage());
         }
     }

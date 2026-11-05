@@ -13,7 +13,6 @@ public class Main {
     private Main() {
     }
 
-
     public static void main(String[] args) {
         BankRepository repository = new BankRepository();
         CustomerService customerService = new CustomerService(repository);

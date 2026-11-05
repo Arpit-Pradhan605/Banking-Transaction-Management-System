@@ -67,11 +67,12 @@ public class AdminMenu {
     }
 
     private void viewAccounts() {
-        if (adminService.viewAllAccounts().isEmpty()) {
+        List<Account> accounts = adminService.viewAllAccounts();
+        if (accounts.isEmpty()) {
             System.out.println("No accounts found.");
             return;
         }
-        for (Account account : adminService.viewAllAccounts()) {
+        for (Account account : accounts) {
             System.out.println(account.getAccountNumber() + " | " + account.getAccountType()
                     + " | " + account.getStatus() + " | balance: " + account.getBalance());
         }
