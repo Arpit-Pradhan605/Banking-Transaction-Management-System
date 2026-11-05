@@ -248,5 +248,7 @@ Phase 2 ownership split:
 - **Arpit (30%)**: `ConcurrencyTestService`, including repeatable concurrent
   scenarios and assertions for final balances and transaction records.
 
-The concurrency test service and a committed automated Phase 2 test suite have
-not yet been added.
+Arpit's `ConcurrencyTestService` is implemented and can be run using the
+commands in [Concurrency checks](#concurrency-checks). It exercises the
+`TransactionService` methods concurrently; there is no separate committed
+automated unit-test suite yet.
