@@ -169,3 +169,56 @@ authentication design.
 
 No persistent database or committed automated Phase 1 test suite is included.
 The application can be compiled using the command in [Run](#run).
+
+## Phase 2: Concurrent Transaction Tasks (in progress)
+
+The `com.bank.threads` package provides `Callable` task wrappers around
+`TransactionService`. Each task performs one operation and returns its
+transaction result; exceptions are not swallowed and are surfaced by
+`Future.get()` as an `ExecutionException`.
+
+```java
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+import com.bank.models.Transaction;
+import com.bank.services.TransactionService;
+import com.bank.threads.DepositTask;
+import com.bank.threads.TransferTask;
+import com.bank.threads.WithdrawTask;
+
+ExecutorService executor = Executors.newFixedThreadPool(4);
+try {
+    Future<Transaction> deposit = executor.submit(
+            new DepositTask(transactionService, accountNumber, 100.0));
+    Future<Transaction> withdrawal = executor.submit(
+            new WithdrawTask(transactionService, accountNumber, 25.0));
+    Future<List<Transaction>> transfer = executor.submit(
+            new TransferTask(transactionService, fromAccount, toAccount, 50.0));
+
+    Transaction depositResult = deposit.get();
+    Transaction withdrawalResult = withdrawal.get();
+    List<Transaction> transferResults = transfer.get();
+} finally {
+    executor.shutdown();
+}
+```
+
+`DepositTask` and `WithdrawTask` return one `Transaction`.
+`TransferTask` returns the debit and credit transactions created for the
+transfer. All tasks use the existing `TransactionService` for validation,
+account updates, and transaction recording. The service currently synchronizes
+its transaction operations, so concurrent task submissions preserve the
+service's serialized operation behavior rather than running those operations
+in parallel.
+
+Phase 2 ownership split:
+
+- **Mohan (70%)**: `DepositTask`, `WithdrawTask`, and `TransferTask`.
+- **Arpit (30%)**: `ConcurrencyTestService`, including repeatable concurrent
+  scenarios and assertions for final balances and transaction records.
+
+The concurrency test service and a committed automated Phase 2 test suite have
+not yet been added.
