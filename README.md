@@ -16,6 +16,34 @@ login is `admin` / `admin123`; set `BANK_ADMIN_USERNAME` and
 Savings accounts require an initial balance of at least ₹500. Customer
 transaction history is limited to accounts owned by the logged-in customer.
 
+## Concurrency checks
+
+Compile the sources using the command above, then run the standalone concurrency
+checks:
+
+```powershell
+java -cp out com.bank.services.ConcurrencyTestService
+```
+
+By default, the service runs 1,000 deposits, 1,000 withdrawals, and 1,000
+transfers in each direction between the same two accounts, using a worker pool.
+Each scenario uses a fresh in-memory repository and verifies final account
+balances and transaction-record counts. Transfer checks also verify that every
+transfer returns a matching debit/credit pair. The service prints expected and
+actual values for each scenario and exits with a non-zero status if a check
+fails.
+
+The operation count per direction and worker count can be supplied as arguments:
+both values must be at least 2.
+
+```powershell
+java -cp out com.bank.services.ConcurrencyTestService 500 8
+```
+
+The checks exercise the public `TransactionService` APIs (`deposit`, `withdraw`,
+and `transfer`) concurrently, so the same entry points can be used by runnable
+task classes.
+
 ## Phase 1: Customer and Account Foundation
 
 Phase 1 provides the in-memory customer and account foundation used by the
